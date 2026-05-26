@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wc -l *.gs *.html)",
+      "WebFetch(domain:script.google.com)"
+    ]
+  }
+}

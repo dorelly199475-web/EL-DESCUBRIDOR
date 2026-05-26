@@ -1,0 +1,26 @@
+{
+  "name": "el-descubridor-pos",
+  "version": "1.0.0",
+  "description": "Sistema de gestión de inventario y punto de venta",
+  "main": "app.js",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "dev": "python -m http.server 8000",
+    "build": "echo 'No build process required for static files'",
+    "test": "echo 'Add tests here'"
+  },
+  "keywords": [
+    "pos",
+    "inventario",
+    "venta",
+    "el-descubridor"
+  ],
+  "author": "Equipo de Sistemas",
+  "license": "MIT",
+  "dependencies": {
+    "jquery": "^3.6.0",
+    "select2": "^4.1.0",
+    "sweetalert2": "^11.0.0"
+  },
+  "devDependencies": {}
+}
