@@ -1,8 +1,22 @@
-# Sistema de Gestión de Inventario - El Descubridor
+# 📦 Sistema de Gestión de Inventario - El Descubridor
 ## Conversión a JavaScript Puro
 
-### Descripción
-Proyecto de gestión de inventario y punto de venta convertido de Google Apps Script a JavaScript estándar.
+**Sistema completo de inventario y punto de venta (POS) con frontend moderno y backend configurable**
+
+### 🎯 Descripción
+Proyecto de gestión de inventario y punto de venta convertido de Google Apps Script a JavaScript estándar. Aplicación web completa con:
+- ✅ Autenticación de usuarios
+- ✅ Gestión de clientes y estudiantes
+- ✅ Inventario de uniformes y artículos
+- ✅ Sistema de ventas y puntos de venta
+- ✅ Cierre de caja diario
+- ✅ Reportes y devoluciones
+- ✅ Interfaz responsiva y moderna
+
+### 🌐 Demo Online
+**[Abre la aplicación aquí](https://dorelly199475-web.github.io/EL-DESCUBRIDOR/)**
+
+> *La aplicación está hosteada en GitHub Pages. Sin necesidad de servidor.*
 
 ### Estructura de Archivos
 
@@ -66,19 +80,51 @@ Módulo de API y datos con:
 ✅ Alertas con SweetAlert2
 ✅ Interfaz responsiva
 
-### Instalación y Uso
+### 🚀 Instalación y Uso
 
-1. **Colocar archivos en servidor web**
-   - Necesitas un servidor web o deploy local (no funciona con file://)
-   - Los archivos CSS y JS deben estar en la misma carpeta que index.html
+#### Opción 1: Online (GitHub Pages) ⭐ RECOMENDADO
+La aplicación está desplegada en vivo sin necesidad de instalación:
 
-2. **Configurar endpoint de API**
-   - Editar `api.js` y actualizar `baseURL` en `APIClient`
-   - Por defecto usa la raíz del servidor
+```
+https://dorelly199475-web.github.io/EL-DESCUBRIDOR/
+```
 
-3. **Abrir en navegador**
-   - `http://localhost:8000/index.html`
-   - O la URL donde hayas deployado los archivos
+**Ventajas:**
+- ✅ No requiere instalación
+- ✅ Accesible desde cualquier dispositivo
+- ✅ Actualizaciones automáticas
+- ✅ SSL incluido
+
+---
+
+#### Opción 2: Servidor Local (Desarrollo)
+
+**Requisitos:**
+- Node.js y npm instalados
+- O Python 3 instalado
+
+**Con Python (más simple):**
+```bash
+cd "ruta/a/APPS SCRIPT INVENTARIO"
+python -m http.server 8000
+```
+Luego abre: `http://localhost:8000`
+
+**Con Node.js:**
+```bash
+npm install
+npm start
+```
+
+---
+
+#### Opción 3: Deploy Propio
+
+Puedes hacer deploy en:
+- **Vercel**: `vercel deploy`
+- **Netlify**: Arrastra la carpeta
+- **Heroku**: Con un backend Node.js
+- **Tu servidor web**: Copia los archivos vía FTP
 
 ### Dependencias Externas
 
@@ -87,40 +133,103 @@ Módulo de API y datos con:
 - [SweetAlert2](https://sweetalert2.github.io/)
 - [Material Icons](https://fonts.google.com/icons)
 
-### Scripts Necesarios para Backend
+### 🔧 Configuración del Backend
 
-Si implementas un backend, necesitarás endpoints API como:
+#### Opción 1: Backend Node.js (Incluido)
 
+**Instalación:**
+```bash
+npm install express cors body-parser
 ```
-GET  /api/clients
-POST /api/clients
-PUT  /api/clients/{id}
-DELETE /api/clients/{id}
 
-GET  /api/items
-POST /api/items
-PUT  /api/items/{id}
-DELETE /api/items/{id}
-
-GET  /api/sales
-POST /api/sales
-PUT  /api/sales/{id}
-DELETE /api/sales/{id}
+**Ejecutar:**
+```bash
+node server.example.js
 ```
+
+El servidor correrá en `http://localhost:3000`
+
+**Endpoints disponibles:**
+```
+GET    /api/clients          → Obtener todos los clientes
+GET    /api/clients/:id      → Obtener cliente específico
+POST   /api/clients          → Crear cliente
+PUT    /api/clients/:id      → Actualizar cliente
+DELETE /api/clients/:id      → Eliminar cliente
+
+GET    /api/items            → Obtener artículos
+POST   /api/items            → Crear artículo
+PUT    /api/items/:id        → Actualizar artículo
+DELETE /api/items/:id        → Eliminar artículo
+
+GET    /api/sales            → Obtener ventas
+POST   /api/sales            → Registrar venta
+
+GET    /api/health           → Health check del servidor
+```
+
+---
+
+#### Opción 2: Conectar a Backend Existente
+
+Edita el archivo `api.js` y actualiza la URL base:
+
+```javascript
+// En api.js, línea 7
+const api = new APIClient('https://tu-servidor.com');
+```
+
+**Asegúrate que tu backend tenga:**
+- CORS habilitado
+- Los mismos endpoints que el ejemplo
+- Autenticación (opcional)
+
+---
+
+#### Opción 3: Usar Google Sheets (Legacy)
+
+Si deseas volver a Google Apps Script:
+1. Copia el código de `Código.gs` (archivo original)
+2. Pégalo en Apps Script de Google Sheets
+3. Deploy como App Web
+4. Cambia la URL en `api.js`
 
 ### Archivos Originales Conservados
 
 - `Código.gs`: Código Google Apps Script original (legacy)
 - `styles.html`: Contenía CSS en formato HTML (reemplazado por styles.css)
 
-### Próximos Pasos
+### 📚 Documentación y Guías
 
-1. Conectar a un backend (Node.js, Python, PHP, etc.)
-2. Implementar persistencia en base de datos
-3. Agregar autenticación más robusta
-4. Implementar reportes y exportación de datos
-5. Agregar validaciones del lado del servidor
-6. Mejorar seguridad con tokens JWT
+#### Para Principiantes
+- [Introducción a Git y GitHub](https://github.com/dorelly199475-web/EL-DESCUBRIDOR)
+- [Cómo usar la aplicación](./GUIA_USO.md)
+- [Estructura del código](./ESTRUCTURA.md)
+
+#### Para Desarrolladores
+- [Configurar un backend con Node.js](./docs/BACKEND_SETUP.md)
+- [Conectar una base de datos](./docs/DATABASE.md)
+- [Agregar nuevas funcionalidades](./docs/EXTENSION.md)
+
+---
+
+### 🛣️ Roadmap (Próximos Pasos)
+
+**Fase 1 (Actual):**
+- ✅ Frontend en JavaScript puro
+- ✅ Deploy en GitHub Pages
+- ✅ Backend Node.js de ejemplo
+
+**Fase 2 (Próximo):**
+- 🔄 Integración con base de datos (MongoDB o PostgreSQL)
+- 🔄 Autenticación con JWT
+- 🔄 Sistema de roles y permisos
+
+**Fase 3 (Futuro):**
+- 📱 Aplicación móvil (React Native)
+- 📊 Dashboards avanzados
+- 🔐 Autenticación de dos factores
+- 💾 Backup automático a la nube
 
 ### Desarrollo
 
@@ -136,3 +245,41 @@ Para modificar el código:
 - Para producción, se recomienda conectar a una base de datos real
 - La seguridad actual es básica - implementar autenticación segura para producción
 - Los datos se pierden al limpiar el caché del navegador
+
+---
+
+## 🤝 Contribuciones
+
+¿Quieres mejorar este proyecto?
+
+1. Fork el repositorio
+2. Crea una rama (`git checkout -b feature/mi-mejora`)
+3. Haz cambios y commit (`git commit -m "Agrego mejora"`)
+4. Push a la rama (`git push origin feature/mi-mejora`)
+5. Abre un Pull Request
+
+---
+
+## 📞 Soporte
+
+- **Reportar bugs**: [GitHub Issues](https://github.com/dorelly199475-web/EL-DESCUBRIDOR/issues)
+- **Sugerir mejoras**: [GitHub Discussions](https://github.com/dorelly199475-web/EL-DESCUBRIDOR/discussions)
+- **Contacto**: cordova0092@gmail.com
+
+---
+
+## 📄 Licencia
+
+Este proyecto está bajo la licencia **MIT**. Puedes usarlo libremente en proyectos personales y comerciales.
+
+---
+
+## 👨‍💻 Autor
+
+**Equipo de Sistemas El Descubridor**
+- GitHub: [@dorelly199475-web](https://github.com/dorelly199475-web)
+- Año: 2025-2026
+
+---
+
+**⭐ Si te gusta este proyecto, dale una estrella en GitHub para mostrar tu apoyo!**
