@@ -169,6 +169,48 @@ function togglePasswordVisibility() {
   }
 }
 
+function showForgotPasswordModal(e) {
+  e.preventDefault();
+  Swal.fire({
+    title: 'Restablecer Contraseña',
+    html: `
+      <p style="font-size:0.9em; color:#666;">Ingresa tu correo registrado y la nueva contraseña que deseas usar.</p>
+      <input id="reset-correo" type="email" class="swal2-input" placeholder="Correo electrónico" required>
+      <input id="reset-password" type="password" class="swal2-input" placeholder="Nueva Contraseña" required>
+    `,
+    showCancelButton: true,
+    confirmButtonText: 'Restablecer',
+    cancelButtonText: 'Cancelar',
+    preConfirm: () => {
+      var correo = document.getElementById('reset-correo').value;
+      var password = document.getElementById('reset-password').value;
+      if (!correo || !password) {
+        Swal.showValidationMessage('Ambos campos son obligatorios');
+        return false;
+      }
+      return { correo: correo, password: password };
+    }
+  }).then((result) => {
+    if (result.isConfirmed) {
+      showGlobalSpinner();
+      google.script.run
+        .withSuccessHandler(function(response) {
+          hideGlobalSpinner();
+          if (response.success) {
+            Swal.fire('Éxito', response.message, 'success');
+          } else {
+            Swal.fire('Error', response.message, 'error');
+          }
+        })
+        .withFailureHandler(function(error) {
+          hideGlobalSpinner();
+          Swal.fire('Error', 'No se pudo restablecer la contraseña: ' + error.message, 'error');
+        })
+        .restablecerPassword(result.value.correo, result.value.password);
+    }
+  });
+}
+
 /* ===================================================
    INICIALIZACIÓN DE SELECT2 (BÚSQUEDA INTELIGENTE)
    =================================================== */

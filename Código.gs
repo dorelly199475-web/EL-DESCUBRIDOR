@@ -251,6 +251,46 @@ function cerrarSesion() {
   }
 }
 
+function restablecerPassword(correo, nuevaPassword) {
+  try {
+    var sheet = getSheet('USUARIOS');
+    var data = sheet.getDataRange().getValues();
+    var headers = data[0];
+    
+    var colCorreo = headers.indexOf('CORREO');
+    var colPassword = headers.indexOf('CONTRASEÑA');
+    if (colPassword === -1) colPassword = headers.indexOf('CONTRASENA');
+    
+    if (colCorreo === -1) {
+      return { success: false, message: 'La columna CORREO no existe en la hoja.' };
+    }
+    
+    var rowIndex = -1;
+    for (var i = 1; i < data.length; i++) {
+      if (String(data[i][colCorreo]).trim().toLowerCase() === String(correo).trim().toLowerCase()) {
+        rowIndex = i + 1;
+        break;
+      }
+    }
+    
+    if (rowIndex === -1) {
+      return { success: false, message: 'El correo ingresado no está registrado.' };
+    }
+    
+    // Si la columna CONTRASEÑA no existe en la hoja, la creamos
+    if (colPassword === -1) {
+      var lastCol = sheet.getLastColumn();
+      sheet.getRange(1, lastCol + 1).setValue('CONTRASEÑA');
+      colPassword = lastCol;
+    }
+    
+    sheet.getRange(rowIndex, colPassword + 1).setValue(nuevaPassword);
+    return { success: true, message: 'Contraseña restablecida correctamente.' };
+  } catch(e) {
+    return { success: false, message: 'Error al restablecer contraseña: ' + e.toString() };
+  }
+}
+
 /* ==================================================
    HELPERS DE BASE DE DATOS
    ================================================== */
