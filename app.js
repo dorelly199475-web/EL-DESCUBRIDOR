@@ -451,8 +451,11 @@ function showUsuarioModal(id) {
                    value="${usuario ? usuario.NOMBRE_USUARIO : ''}" required>
             <input id="swal-usuario" class="swal2-input" placeholder="Usuario" 
                    value="${usuario ? usuario.USUARIO : ''}" required>
-            <input id="swal-correo" type="email" class="swal2-input" placeholder="Correo (Contraseña)" 
+            <input id="swal-correo" type="email" class="swal2-input" placeholder="Correo" 
                    value="${usuario ? usuario.CORREO : ''}" required>
+            <input id="swal-password" type="password" class="swal2-input" 
+                   placeholder="${id ? 'Contraseña (dejar en blanco para no cambiar)' : 'Contraseña'}" 
+                   ${id ? '' : 'required'}>
           `,
     focusConfirm: false,
     showCancelButton: true,
@@ -462,8 +465,9 @@ function showUsuarioModal(id) {
       var nombre = document.getElementById('swal-nombre').value;
       var user = document.getElementById('swal-usuario').value;
       var correo = document.getElementById('swal-correo').value;
+      var password = document.getElementById('swal-password').value;
 
-      if (!nombre || !user || !correo) {
+      if (!nombre || !user || !correo || (!id && !password)) {
         Swal.showValidationMessage('Todos los campos son obligatorios');
         return false;
       }
@@ -472,7 +476,8 @@ function showUsuarioModal(id) {
         id: id,
         nombre: nombre,
         usuario: user,
-        correo: correo
+        correo: correo,
+        password: password
       };
     }
   }).then((result) => {

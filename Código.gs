@@ -335,13 +335,33 @@ function saveUsuario(data) {
   try {
     var sheet = getSheet('USUARIOS');
     var id = 'USR-' + new Date().getTime();
+    var headers = sheet.getDataRange().getValues()[0];
     
-    sheet.appendRow([
-      id,
-      data.nombre,
-      data.usuario,
-      data.correo
-    ]);
+    var colId = headers.indexOf('ID_USUARIO');
+    var colNombre = headers.indexOf('NOMBRE_USUARIO');
+    var colUsuario = headers.indexOf('USUARIO');
+    var colCorreo = headers.indexOf('CORREO');
+    var colPassword = headers.indexOf('CONTRASEÑA');
+    if (colPassword === -1) colPassword = headers.indexOf('CONTRASENA');
+    
+    var rowData = [];
+    headers.forEach(function(header, idx) {
+      if (idx === colId) rowData.push(id);
+      else if (idx === colNombre) rowData.push(data.nombre);
+      else if (idx === colUsuario) rowData.push(data.usuario);
+      else if (idx === colCorreo) rowData.push(data.correo);
+      else if (idx === colPassword) rowData.push(data.password || '');
+      else rowData.push('');
+    });
+    
+    // Si la columna CONTRASEÑA no existe en la hoja, la creamos al final
+    if (colPassword === -1) {
+      var lastCol = sheet.getLastColumn();
+      sheet.getRange(1, lastCol + 1).setValue('CONTRASEÑA');
+      rowData.push(data.password || '');
+    }
+    
+    sheet.appendRow(rowData);
     
     return { 
       success: true, 
@@ -383,10 +403,15 @@ function updateUsuario(data) {
     var colNombre = headers.indexOf('NOMBRE_USUARIO');
     var colUsuario = headers.indexOf('USUARIO');
     var colCorreo = headers.indexOf('CORREO');
+    var colPassword = headers.indexOf('CONTRASEÑA');
+    if (colPassword === -1) colPassword = headers.indexOf('CONTRASENA');
     
     if (colNombre !== -1) sheet.getRange(rowIndex, colNombre + 1).setValue(data.nombre);
     if (colUsuario !== -1) sheet.getRange(rowIndex, colUsuario + 1).setValue(data.usuario);
     if (colCorreo !== -1) sheet.getRange(rowIndex, colCorreo + 1).setValue(data.correo);
+    if (colPassword !== -1 && data.password) {
+      sheet.getRange(rowIndex, colPassword + 1).setValue(data.password);
+    }
     
     return { 
       success: true, 
