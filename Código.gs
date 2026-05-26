@@ -1,7 +1,12 @@
-/* ==================================================
-   CONFIGURACIÓN Y MENU
-   ================================================== */
-var SPREADSHEET_ID = '1_YW8XnNxF_H_ZSF1t-yk0JUA6OU1D1TqYjTsvz-gUIU';
+var SPREADSHEET_ID = '1_YW8XnNxF_H_2SF1t-yk0JUA6OU1D1TqYjTsvz-gUIU';
+
+function getSpreadsheet() {
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    if (ss) return ss;
+  } catch(e) {}
+  return SpreadsheetApp.openById(SPREADSHEET_ID);
+}
 
 function doGet() {
   return HtmlService.createTemplateFromFile('index')
@@ -57,10 +62,10 @@ function clearActiveUser() {
  */
 function logConcurrencyIssue(operation, error, attempts) {
   try {
-    var sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('LOGS_CONCURRENCIA');
+    var sheet = getSpreadsheet().getSheetByName('LOGS_CONCURRENCIA');
     if (!sheet) {
       // Crear hoja de logs si no existe
-      sheet = SpreadsheetApp.openById(SPREADSHEET_ID).insertSheet('LOGS_CONCURRENCIA');
+      sheet = getSpreadsheet().insertSheet('LOGS_CONCURRENCIA');
       sheet.appendRow(['Fecha_Hora', 'Usuario', 'Operacion', 'Error', 'Intentos', 'Resuelto']);
     }
     
@@ -245,7 +250,7 @@ function cerrarSesion() {
    HELPERS DE BASE DE DATOS
    ================================================== */
 function getSheet(name) {
-  return SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(name);
+  return getSpreadsheet().getSheetByName(name);
 }
 
 function getData(sheetName) {
