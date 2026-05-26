@@ -200,26 +200,31 @@ function verificarLogin(usuario, password) {
     
     var headers = data[0];
     var colUsuario = headers.indexOf('USUARIO');
-    var colCorreo = headers.indexOf('CORREO');
-    var colNombre = headers.indexOf('NOMBRE_USUARIO');
+    var colPassword = headers.indexOf('CONTRASEÑA');
+    if (colPassword === -1) colPassword = headers.indexOf('CONTRASENA');
+    if (colPassword === -1) colPassword = headers.indexOf('CORREO');
     
-    if (colUsuario === -1 || colCorreo === -1) {
+    var colNombre = headers.indexOf('NOMBRE_USUARIO');
+    var colCorreo = headers.indexOf('CORREO');
+    
+    if (colUsuario === -1 || colPassword === -1) {
       return {
         success: false,
-        message: 'Columnas USUARIO o CORREO no encontradas'
+        message: 'Columnas de credenciales no encontradas'
       };
     }
     
     // Buscar usuario
     for (var i = 1; i < data.length; i++) {
-      if (data[i][colUsuario] == usuario && data[i][colCorreo] == password) {
+      if (data[i][colUsuario] == usuario && data[i][colPassword] == password) {
         // Login exitoso
-        setActiveUser(data[i][colCorreo]);
+        var userEmail = colCorreo !== -1 ? data[i][colCorreo] : (usuario + "@sistema.local");
+        setActiveUser(userEmail);
         return {
           success: true,
           message: 'Login exitoso',
           nombre: data[i][colNombre] || usuario,
-          correo: data[i][colCorreo]
+          correo: userEmail
         };
       }
     }
