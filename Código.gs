@@ -15,6 +15,23 @@ function include(filename) {
   return HtmlService.createHtmlOutputFromFile(filename).getContent();
 }
 
+function doPost(e) {
+  try {
+    var request = JSON.parse(e.postData.contents);
+    var functionName = request.functionName;
+    var args = request.args || [];
+    
+    // Ejecutar la función solicitada dinámicamente
+    var result = this[functionName].apply(this, args);
+    
+    return ContentService.createTextOutput(JSON.stringify(result))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({ success: false, error: error.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
 function getActiveUser() {
   var userProps = PropertiesService.getUserProperties();
   var userEmail = userProps.getProperty('userEmail');

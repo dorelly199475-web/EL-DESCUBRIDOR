@@ -1,4 +1,10 @@
 /* ===================================================
+   CONFIGURACIÓN DE LA BASE DE DATOS
+   =================================================== */
+// Pega aquí la URL de tu implementación de Google Apps Script (Web App)
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/1laL9LXfjb6lYWhV6R6SXxFsKCkYy_WnFOU6qaC7AhIM/exec"; 
+
+/* ===================================================
    COMPATIBILITY SHIM FOR google.script.run
    =================================================== */
 class GoogleScriptRun {
@@ -38,9 +44,9 @@ const googleScriptRunProxyHandler = {
       target._success = () => {};
       target._failure = (err) => console.error(err);
       
-      fetch('/api/run', {
+      fetch(GOOGLE_SCRIPT_URL || '/api/run', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({ functionName: prop, args: args })
       })
       .then(res => {
