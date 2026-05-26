@@ -1302,4 +1302,25 @@ input[type="checkbox"]:not(:checked) {
   }
 }
 
+/* ===================================================
+   ROLE BADGES STYLING
+   =================================================== */
+.role-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8em;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-align: center;
+}
+.role-badge.administrador {
+  background-color: #f39c12;
+  color: white;
+}
+.role-badge.asesor {
+  background-color: #3498db;
+  color: white;
+}
+
 

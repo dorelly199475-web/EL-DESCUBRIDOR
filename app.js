@@ -146,6 +146,7 @@ var globalUsuarios = [];
 var cart = [];
 var cartMisc = [];
 var currentUser = null;
+var currentUserRole = 'ASESOR';
 var currentClientFixed = null;
 var CACHE_DURATION = 5 * 60 * 1000; // 5 minutos
 
@@ -310,6 +311,7 @@ function handleLoginResponse(response) {
   hideGlobalSpinner();
   if (response.success) {
     currentUser = response.correo;
+    currentUserRole = response.cargo || 'ASESOR';
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app-container').style.display = 'flex';
     document.getElementById('sys-user-display').innerText = response.correo;
@@ -363,6 +365,8 @@ function loadInitialData() {
 function handleInitialData(data) {
   hideGlobalSpinner();
   if (data.success) {
+    currentUser = data.usuario;
+    currentUserRole = data.cargo || 'ASESOR';
     document.getElementById('stat-clientes').innerText = data.clientesCount;
     document.getElementById('stat-articulos').innerText = data.articulosCount;
     document.getElementById('badge-clients').innerText = data.clientesCount;
@@ -460,25 +464,34 @@ function renderUsuariosTable(data) {
   var tbody = document.querySelector('#usuarios-table tbody');
 
   if (!data || data.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="5" class="text-center">No hay usuarios registrados</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center">No hay usuarios registrados</td></tr>';
     return;
   }
 
   tbody.innerHTML = '';
   data.forEach(function (u) {
     var row = document.createElement('tr');
+    
+    var deleteButtonHtml = '';
+    if (currentUserRole === 'ADMINISTRADOR') {
+      deleteButtonHtml = `
+        <button class="btn-icon" onclick="confirmDeleteUsuario('${u.ID_USUARIO}')" title="Eliminar" style="margin-left: 8px;">
+          <span class="material-icons" style="color: #e74c3c;">delete</span>
+        </button>
+      `;
+    }
+
     row.innerHTML = `
             <td>${u.ID_USUARIO || 'N/A'}</td>
             <td>${u.NOMBRE_USUARIO || ''}</td>
             <td>${u.USUARIO || ''}</td>
             <td>${u.CORREO || ''}</td>
+            <td><span class="role-badge ${String(u.CARGO || u.ROL || 'ASESOR').toLowerCase()}">${u.CARGO || u.ROL || 'ASESOR'}</span></td>
             <td>
               <button class="btn-icon" onclick="editUsuario('${u.ID_USUARIO}')" title="Editar">
                 <span class="material-icons">edit</span>
               </button>
-              <button class="btn-icon" onclick="confirmDeleteUsuario('${u.ID_USUARIO}')" title="Eliminar" style="margin-left: 8px;">
-                <span class="material-icons" style="color: #e74c3c;">delete</span>
-              </button>
+              ${deleteButtonHtml}
             </td>
           `;
     tbody.appendChild(row);
@@ -525,19 +538,27 @@ function confirmDeleteUsuario(id) {
 function showUsuarioModal(id) {
   var title = id ? 'Editar Usuario' : 'Nuevo Usuario';
   var usuario = id ? globalUsuarios.find(u => u.ID_USUARIO == id) : null;
+  var userCargo = usuario ? (usuario.CARGO || usuario.ROL || 'ASESOR') : 'ASESOR';
 
   Swal.fire({
     title: title,
     html: `
             <input id="swal-nombre" class="swal2-input" placeholder="Nombre Completo" 
-                   value="${usuario ? usuario.NOMBRE_USUARIO : ''}" required>
+                   value="${usuario ? (usuario.NOMBRE_USUARIO || '') : ''}" required>
             <input id="swal-usuario" class="swal2-input" placeholder="Usuario" 
-                   value="${usuario ? usuario.USUARIO : ''}" required>
+                   value="${usuario ? (usuario.USUARIO || '') : ''}" required>
             <input id="swal-correo" type="email" class="swal2-input" placeholder="Correo" 
-                   value="${usuario ? usuario.CORREO : ''}" required>
+                   value="${usuario ? (usuario.CORREO || '') : ''}" required>
             <input id="swal-password" type="password" class="swal2-input" 
                    placeholder="${id ? 'Contraseña (dejar en blanco para no cambiar)' : 'Contraseña'}" 
                    ${id ? '' : 'required'}>
+            <div style="margin-top: 15px; text-align: left; padding: 0 1.6em;">
+              <label for="swal-cargo" style="font-weight: 600; color: #444; font-size: 0.9em; display: block; margin-bottom: 5px;">Cargo / Rol:</label>
+              <select id="swal-cargo" class="swal2-select" style="width: 100%; margin: 0; display: block; box-sizing: border-box;">
+                <option value="ASESOR" ${userCargo === 'ASESOR' ? 'selected' : ''}>ASESOR</option>
+                <option value="ADMINISTRADOR" ${userCargo === 'ADMINISTRADOR' ? 'selected' : ''}>ADMINISTRADOR</option>
+              </select>
+            </div>
           `,
     focusConfirm: false,
     showCancelButton: true,
@@ -548,6 +569,7 @@ function showUsuarioModal(id) {
       var user = document.getElementById('swal-usuario').value;
       var correo = document.getElementById('swal-correo').value;
       var password = document.getElementById('swal-password').value;
+      var cargo = document.getElementById('swal-cargo').value;
 
       if (!nombre || !user || !correo || (!id && !password)) {
         Swal.showValidationMessage('Todos los campos son obligatorios');
@@ -559,7 +581,8 @@ function showUsuarioModal(id) {
         nombre: nombre,
         usuario: user,
         correo: correo,
-        password: password
+        password: password,
+        cargo: cargo
       };
     }
   }).then((result) => {

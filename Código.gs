@@ -206,6 +206,8 @@ function verificarLogin(usuario, password) {
     
     var colNombre = headers.indexOf('NOMBRE_USUARIO');
     var colCorreo = headers.indexOf('CORREO');
+    var colCargo = headers.indexOf('CARGO');
+    if (colCargo === -1) colCargo = headers.indexOf('ROL');
     
     if (colUsuario === -1 || colPassword === -1) {
       return {
@@ -224,7 +226,8 @@ function verificarLogin(usuario, password) {
           success: true,
           message: 'Login exitoso',
           nombre: data[i][colNombre] || usuario,
-          correo: userEmail
+          correo: userEmail,
+          cargo: colCargo !== -1 ? data[i][colCargo] : 'ASESOR'
         };
       }
     }
@@ -337,11 +340,32 @@ function getInitialData() {
     var artCount = artSheet ? Math.max(0, artSheet.getLastRow() - 1) : 0;
     var cliCount = cliSheet ? Math.max(0, cliSheet.getLastRow() - 1) : 0;
     
+    // Buscar el cargo del usuario activo en la hoja de USUARIOS
+    var cargo = 'ASESOR';
+    try {
+      var userSheet = getSheet('USUARIOS');
+      var data = userSheet.getDataRange().getValues();
+      var headers = data[0];
+      var colCorreo = headers.indexOf('CORREO');
+      var colCargo = headers.indexOf('CARGO');
+      if (colCargo === -1) colCargo = headers.indexOf('ROL');
+      
+      if (colCorreo !== -1 && colCargo !== -1) {
+        for (var i = 1; i < data.length; i++) {
+          if (String(data[i][colCorreo]).trim().toLowerCase() === String(user).trim().toLowerCase()) {
+            cargo = String(data[i][colCargo]).trim().toUpperCase();
+            break;
+          }
+        }
+      }
+    } catch(e) {}
+    
     return {
       success: true,
       articulosCount: artCount,
       clientesCount: cliCount,
       usuario: user,
+      cargo: cargo,
       needsLogin: false
     };
   } catch(e) {
@@ -383,6 +407,8 @@ function saveUsuario(data) {
     var colCorreo = headers.indexOf('CORREO');
     var colPassword = headers.indexOf('CONTRASEÑA');
     if (colPassword === -1) colPassword = headers.indexOf('CONTRASENA');
+    var colCargo = headers.indexOf('CARGO');
+    if (colCargo === -1) colCargo = headers.indexOf('ROL');
     
     var rowData = [];
     headers.forEach(function(header, idx) {
@@ -391,8 +417,17 @@ function saveUsuario(data) {
       else if (idx === colUsuario) rowData.push(data.usuario);
       else if (idx === colCorreo) rowData.push(data.correo);
       else if (idx === colPassword) rowData.push(data.password || '');
+      else if (idx === colCargo) rowData.push(data.cargo || 'ASESOR');
       else rowData.push('');
     });
+    
+    // Si la columna CARGO no existe en la hoja, la creamos al final
+    if (colCargo === -1) {
+      var lastCol = sheet.getLastColumn();
+      sheet.getRange(1, lastCol + 1).setValue('CARGO');
+      colCargo = lastCol;
+      rowData.push(data.cargo || 'ASESOR');
+    }
     
     // Si la columna CONTRASEÑA no existe en la hoja, la creamos al final
     if (colPassword === -1) {
@@ -445,12 +480,17 @@ function updateUsuario(data) {
     var colCorreo = headers.indexOf('CORREO');
     var colPassword = headers.indexOf('CONTRASEÑA');
     if (colPassword === -1) colPassword = headers.indexOf('CONTRASENA');
+    var colCargo = headers.indexOf('CARGO');
+    if (colCargo === -1) colCargo = headers.indexOf('ROL');
     
     if (colNombre !== -1) sheet.getRange(rowIndex, colNombre + 1).setValue(data.nombre);
     if (colUsuario !== -1) sheet.getRange(rowIndex, colUsuario + 1).setValue(data.usuario);
     if (colCorreo !== -1) sheet.getRange(rowIndex, colCorreo + 1).setValue(data.correo);
     if (colPassword !== -1 && data.password) {
       sheet.getRange(rowIndex, colPassword + 1).setValue(data.password);
+    }
+    if (colCargo !== -1 && data.cargo) {
+      sheet.getRange(rowIndex, colCargo + 1).setValue(data.cargo);
     }
     
     return { 
