@@ -476,9 +476,49 @@ function renderUsuariosTable(data) {
               <button class="btn-icon" onclick="editUsuario('${u.ID_USUARIO}')" title="Editar">
                 <span class="material-icons">edit</span>
               </button>
+              <button class="btn-icon" onclick="confirmDeleteUsuario('${u.ID_USUARIO}')" title="Eliminar" style="margin-left: 8px;">
+                <span class="material-icons" style="color: #e74c3c;">delete</span>
+              </button>
             </td>
           `;
     tbody.appendChild(row);
+  });
+}
+
+function confirmDeleteUsuario(id) {
+  var usuario = globalUsuarios.find(u => u.ID_USUARIO == id);
+  if (!usuario) return;
+
+  if (usuario.CORREO === currentUser) {
+    Swal.fire('Error', 'No puedes eliminar a tu propio usuario activo.', 'warning');
+    return;
+  }
+
+  Swal.fire({
+    title: '¿Eliminar Usuario?',
+    text: `¿Estás seguro de que deseas eliminar al usuario "${usuario.NOMBRE_USUARIO}"? Esta acción no se puede deshacer.`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      showGlobalSpinner();
+      google.script.run
+        .withSuccessHandler(function (response) {
+          hideGlobalSpinner();
+          if (response.success) {
+            Swal.fire('Eliminado', response.message, 'success');
+            loadUsuarios();
+          } else {
+            Swal.fire('Error', response.message, 'error');
+          }
+        })
+        .withFailureHandler(handleError)
+        .deleteUsuario(id, currentUser);
+    }
   });
 }
 

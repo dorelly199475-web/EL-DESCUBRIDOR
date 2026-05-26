@@ -465,6 +465,63 @@ function updateUsuario(data) {
   }
 }
 
+function deleteUsuario(id, emailUsuarioActivo) {
+  try {
+    var sheet = getSheet('USUARIOS');
+    var data = sheet.getDataRange().getValues();
+    var headers = data[0];
+    
+    var colId = headers.indexOf('ID_USUARIO');
+    var colCorreo = headers.indexOf('CORREO');
+    var colRol = headers.indexOf('ROL');
+    
+    // Verificar si el usuario activo es administrador
+    var esAdmin = false;
+    
+    for (var i = 1; i < data.length; i++) {
+      if (String(data[i][colCorreo]).trim().toLowerCase() === String(emailUsuarioActivo).trim().toLowerCase()) {
+        if (colRol !== -1) {
+          var rol = String(data[i][colRol]).trim().toUpperCase();
+          if (rol === 'ADMINISTRADOR' || rol === 'ADMIN') {
+            esAdmin = true;
+          }
+        } else {
+          // Si no hay columna ROL, el primer usuario o rsaltarin@gmail.com es administrador
+          if (i === 1 || String(emailUsuarioActivo).trim().toLowerCase() === 'rsaltarin@gmail.com') {
+            esAdmin = true;
+          }
+        }
+        break;
+      }
+    }
+    
+    if (!esAdmin) {
+      return { success: false, message: 'No tienes permisos de administrador para realizar esta acción.' };
+    }
+    
+    // No permitir que el administrador se elimine a sí mismo
+    var rowIndex = -1;
+    for (var i = 1; i < data.length; i++) {
+      if (data[i][colId] == id) {
+        if (String(data[i][colCorreo]).trim().toLowerCase() === String(emailUsuarioActivo).trim().toLowerCase()) {
+          return { success: false, message: 'No puedes eliminar a tu propio usuario activo.' };
+        }
+        rowIndex = i + 1;
+        break;
+      }
+    }
+    
+    if (rowIndex === -1) {
+      return { success: false, message: 'Usuario no encontrado.' };
+    }
+    
+    sheet.deleteRow(rowIndex);
+    return { success: true, message: 'Usuario eliminado correctamente.' };
+  } catch(e) {
+    return { success: false, message: 'Error al eliminar usuario: ' + e.toString() };
+  }
+}
+
 /* ==================================================
    MÓDULO: CLIENTES
    ================================================== */
